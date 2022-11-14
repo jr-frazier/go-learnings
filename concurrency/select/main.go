@@ -1,18 +1,32 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
-	ch1, ch2 := make(chan int), make(chan int)
+	// create two channels that will be receiving string values
+	ch1 := make(chan string)
+	ch2 := make(chan string)
 
 	go func() {
-		ch1 <- 42
+		time.Sleep(2 * time.Second)
+		ch1 <- "one"
 	}()
 
-	select {
-	case val := <-ch1:
-		fmt.Printf("got %d from ch1\n", val)
-	case val := <-ch2:
-		fmt.Printf("got %d from ch2\n", val)
+	go func() {
+		time.Sleep(2 * time.Second)
+		ch2 <- "two"
+	}()
+
+	for i := 0; i < 2; i++ {
+		select {
+		case msg1 := <-ch1:
+			fmt.Println("received", msg1)
+		case msg2 := <-ch2:
+			fmt.Println("received", msg2)
+		}
 	}
+
 }
